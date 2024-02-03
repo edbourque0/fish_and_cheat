@@ -1,43 +1,41 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import requests
 import random
+import time
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '293ry827r82u3jd3y4fh29f34ojfi3u4fijwhf3'
+app.config['SECRET_KEY'] = 'une_cle_secrete_tres_secure'
 
-joueursAassigner = []
-joueursAssignees = []
-roles = []  # Stocke le rôle de chaque joueur
-question_actuelle = None
+joueurs = []  # Liste pour stocker les noms des joueurs inscrits
+roles = {}    # Dictionnaire pour stocker les rôles des joueurs
+partie_demarree = False
+question_actuelle = None  # Stocke la question actuelle et ses détails
 
-def obtenir_question():
-    reponse = requests.get("https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple")
-    if reponse.status_code == 200:
-        data = reponse.json()
-        question = data['results'][0]
-        return {
-            'question': question['question'],
-            'correct_answer': question['correct_answer'],
-            'incorrect_answers': question['incorrect_answers']
-        }
-    else:
-        return None
+def obtenir_question(max_retries=5):
+    url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
+    for attempt in range(max_retries):
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            return data['results'][0]
+        else:
+            print(f"Tentative {attempt + 1} échouée, statut {response.status_code}. Réessai dans 1 seconde...")
+            time.sleep(1)
+    return None
 
 def assigner_roles():
-    #Assigner tricheur
-    tricheur = random.choice(players)
-    newplayers.append((tricheur, 'Tricheur'))
-    players.pop(players.index(tricheur))
+    global roles
+    temp_players = joueurs[:]
+    tricheur = random.choice(temp_players)
+    roles[tricheur] = 'Tricheur'
+    temp_players.remove(tricheur)
 
-    #Assigner lecteur
-    lecteur = random.choice(players)
-    newplayers.append((lecteur, 'lecteur'))
-    players.pop(players.index(lecteur))
+    lecteur = random.choice(temp_players)
+    roles[lecteur] = 'Lecteur'
+    temp_players.remove(lecteur)
 
-    #Assigner joueurs
-    for joueur in players:
-        newplayers.append((joueur, 'joueur'))
-        players.pop(players.index(joueur))
+    for joueur in temp_players:
+        roles[joueur] = 'Joueur'
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -46,33 +44,39 @@ def home():
         if nom_joueur and nom_joueur not in joueurs:
             joueurs.append(nom_joueur)
             session['nom'] = nom_joueur
-            if len(joueurs) >= 3:  # Un nombre minimal de joueurs pour démarrer le jeu
-                assigner_roles()
-                return redirect(url_for('salle_attente'))
+        return redirect(url_for('salle_attente'))
     return render_template('index.html')
 
 @app.route('/salle_attente')
 def salle_attente():
-    if 'nom' not in session:
-        return redirect(url_for('home'))
-    if roles:  # Si les rôles ont été assignés
+    if partie_demarree:
         return redirect(url_for('partie'))
-    return render_template('salle_attente.html', joueurs=joueurs)
+    premier_joueur = joueurs[0] if joueurs else None
+    return render_template('salle_attente.html', joueurs=joueurs, joueur_session=session.get('nom'), premier_joueur=premier_joueur)
 
-@app.route('/partie', methods=['GET', 'POST'])
+@app.route('/lancer_jeu', methods=['POST'])
+def lancer_jeu():
+    global partie_demarree, question_actuelle
+    if 'nom' in session and joueurs and session['nom'] == joueurs[0]:
+        partie_demarree = True
+        question_actuelle = obtenir_question()
+        if question_actuelle:
+            assigner_roles()
+            return redirect(url_for('partie'))
+        else:
+            # Gérer le cas où aucune question n'a pu être récupérée
+            partie_demarree = False  # Réinitialiser si la récupération échoue
+            return "Erreur lors de la récupération de la question, veuillez réessayer.", 500
+    return redirect(url_for('salle_attente'))
+
+@app.route('/partie')
 def partie():
-    role = roles.get(session.get('nom'), '')
-    if request.method == 'POST' and role == 'lecteur':
-        action = request.form.get('action')
-        if action == 'changer':
-            question_actuelle = obtenir_question()
-        elif action == 'envoyer':
-            # Lorsque la question est envoyée, elle ne change pas
-            pass
-    else:
-        question_actuelle = obtenir_question() if not question_actuelle else question_actuelle
-
-    return render_template('partie.html', role=role, question=question_actuelle)
+    if not partie_demarree or 'nom' not in session:
+        return redirect(url_for('salle_attente'))
+    nom_joueur = session['nom']
+    role_joueur = roles.get(nom_joueur, 'Joueur')
+    afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=2828)

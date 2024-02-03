@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Partie en cours</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>La partie a commencée !</h1>
-    {% if role == 'lecteur' %}
-        <p>Vous êtes le lecteur.</p>
-        <p>Question : {{ question['question'] }}</p>
-        <form action="" method="post">
-            <button name="action" value="changer">Changer la question</button>
-            <button name="action" value="envoyer">Envoyer la question</button>
-        </form>
-    {% else %}
-        <p>Question : {{ question['question'] }}</p>
-        {% if role == 'tricheur' or role == 'joueur' %}
-            <p>Réponse : {{ question['correct_answer'] }}</p>
-        {% endif %}
+    <h1 class="page-header">Partie en cours</h1>
+    <p>Votre rôle : {{ role }}</p>
+    {% if question %}
+        <div class="question-et-reponse">
+            <p class="question">Question : {{ question['question'] }}</p>
+            {% if role != 'Lecteur' %}
+                <p class="reponse">Réponse : {{ question['correct_answer'] }}</p>
+            {% else %}
+                <p>En tant que lecteur, la réponse ne vous est pas affichée.</p>
+            {% endif %}
+        </div>
     {% endif %}
 </body>
 </html>

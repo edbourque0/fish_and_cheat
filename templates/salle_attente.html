@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Salle d'attente</title>
-    <!-- Rafraîchissement automatique toutes les 5 secondes -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <meta http-equiv="refresh" content="5">
 </head>
 <body>
-    <h1>Salle d'attente</h1>
-    <p>Les joueurs inscrits :</p>
-    <ul>
-        {% for joueur in joueurs %}
-            <li>{{ joueur }}</li>
-        {% endfor %}
-    </ul>
-    {% if roles %}
-    <!-- Redirige vers la partie une fois que les rôles sont assignés -->
-    <script type="text/javascript">
-        window.location.href = "{{ url_for('partie') }}";
-    </script>
-    {% endif %}
+    <div class="salle-attente-container">
+        <div class="joueurs-liste">
+            <h1>Salle d'attente</h1>
+            <p>Les joueurs inscrits :</p>
+            <ul>
+                {% for joueur in joueurs %}
+                    <li>{{ joueur }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% if joueur_session == premier_joueur %}
+            <div class="footer">
+                <form action="{{ url_for('lancer_jeu') }}" method="post">
+                    <button type="submit">Démarrer la partie</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
