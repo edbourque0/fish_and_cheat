@@ -41,6 +41,16 @@ def assigner_roles():
     for joueur in temp_players:
         roles[joueur] = 'Joueur'
 
+def reset_param():
+        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele
+        joueurs = []
+        roles = {}
+        partie_demarree = False
+        question_actuelle = None
+        points = 0
+        tricheur_revele = False
+        tricheur = ''
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -51,6 +61,11 @@ def home():
             session['nom'] = nom_joueur
         return redirect(url_for('salle_attente'))
     return render_template('index.html')
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    reset_param()
+    return redirect(url_for('home'))
 
 @app.route('/salle_attente')
 def salle_attente():

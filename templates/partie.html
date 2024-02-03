@@ -13,7 +13,7 @@
                     if (data.redirect) {
                         window.location.href = data.redirect; // Redirection vers la page de résultats
                     } else {
-                        alert(`Pas le tricheur. Points: ${data.points}`);
+                        alert(`Ce n'est pas le tricheur! Points: ${data.points}`);
                     }
                 })
                 .catch(error => console.error('Erreur:', error));
@@ -27,7 +27,7 @@
     <p class="role">Votre rôle : {{ role }}</p>
     {% if question %}
         <div>
-            <p class="question">{{ question['question'] }}</p>
+            <p class="question">{{ question['question'].replace('&quot;', '') }}</p>
             {% if role != 'Lecteur' %}
                 <p class="answer">Réponse : {{ question['correct_answer'] }}</p>
             {% endif %}
@@ -37,7 +37,7 @@
     <form action="{{ url_for('nouvelle_question') }}" method="post">
         <button class="bouton_question" type="submit">Obtenir une nouvelle question</button>
     </form>
-    <p></p>
+    <p class="text_tricheur">Cliquez sur le joueur que vous croyez être le tricheur:</p>
     <div id="joueurs-buttons">
         {% for joueur, joueur_role in roles.items() %}
             {% if joueur != nom_joueur %}

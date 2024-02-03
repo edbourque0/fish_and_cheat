@@ -13,6 +13,10 @@
             <input type="text" id="nom" name="nom" required>
         <button type="submit">Rejoindre</button>
     </form>
-    <p>{{ joueurs }}</p>
+    <p></p>
+    <p></p>
+    <form action="{{ url_for('reset') }} " method="POST">
+        <button class="reset" type="submit">Réinitialiser une partie</button>
+    </form>
 </body>
 </html>

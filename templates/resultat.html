@@ -11,7 +11,8 @@
         <h1>Résultats de la Partie</h1>
         <p>Le tricheur était : {{ tricheur }}</p>
         <p>Nombre de points accumulés : {{ points }}</p>
-        <form action="{{ url_for('home') }}" method="post">
+        <div></div>
+        <form action="{{ url_for('home') }}" method="get">
             <button type="submit">Refaire une partie</button>
         </form>
     </div>
