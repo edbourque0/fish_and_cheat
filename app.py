@@ -101,7 +101,7 @@ def partie():
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele = tricheur_revele)
 
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
