@@ -26,7 +26,7 @@
     <h1 class="page-header">Partie en cours</h1>
     <p class="role">Votre rôle : {{ role }}</p>
     {% if question %}
-        <div class="question-et-reponse">
+        <div>
             <p class="question">{{ question['question'] }}</p>
             {% if role != 'Lecteur' %}
                 <p class="answer">Réponse : {{ question['correct_answer'] }}</p>
@@ -35,8 +35,9 @@
     {% endif %}
     {% if role == 'Lecteur' %}
     <form action="{{ url_for('nouvelle_question') }}" method="post">
-        <button type="submit">Obtenir une nouvelle question</button>
+        <button class="bouton_question" type="submit">Obtenir une nouvelle question</button>
     </form>
+    <p></p>
     <div id="joueurs-buttons">
         {% for joueur, joueur_role in roles.items() %}
             {% if joueur != nom_joueur %}
@@ -44,11 +45,12 @@
             {% endif %}
         {% endfor %}
     </div>
-    <h2>Points: <span id="points">0</span></h2>
+    <p></p>
+    <h2>Points: <span id="points">{{ points }}</span></h2>
     {% endif %}
     {% if tricheur_revele == True %}
         <h2>La partie est terminée</h2>
-        <form action="{{ url_for('resultat', tricheur=joueur, points=points) }}" method="get">
+        <form action="{{ url_for('resultat') }}" method="get">
             <button type="submit">Voir les résultats</button>
         </form>
     {% endif %}

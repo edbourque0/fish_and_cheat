@@ -4,18 +4,8 @@ import random
 import time
 import json
 
-POINTS_FICHIER = 'points.json'
-
-def lire_points():
-    """Lire les points des joueurs depuis le fichier JSON."""
-    try:
-        with open(POINTS_FICHIER, 'r') as fichier:
-            return json.load(fichier)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'une_cle_secrete_tres_secure'
+app.config['SECRET_KEY'] = '872y3r872h3e872h367r24gr23ge'
 
 joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
@@ -23,6 +13,7 @@ partie_demarree = False
 question_actuelle = None  # Stocke la question actuelle et ses détails
 points = 0
 tricheur_revele = False
+tricheur = ''
 
 def obtenir_question(max_retries=5):
     url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
@@ -90,7 +81,7 @@ def partie():
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele = tricheur_revele)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele = tricheur_revele, points=points)
 
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
@@ -104,11 +95,12 @@ def nouvelle_question():
 
 @app.route('/verifier_joueur/<joueur>', methods=['POST'])
 def verifier_joueur(joueur):
-    global points, tricheur_revele
+    global points, tricheur_revele, tricheur
     if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
+        tricheur = str(joueur)
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:
         points += 1
@@ -117,8 +109,7 @@ def verifier_joueur(joueur):
 
 @app.route('/resultat')
 def resultat():
-    tricheur = request.args.get('tricheur')
-    points = request.args.get('points')
+    global roles, tricheur
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
 

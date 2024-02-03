@@ -21,13 +21,13 @@ body, html {
     margin-top: 20px;
 }
 
-.title, .question {
-    background: #fff;
+.question {
     color: #333;
+    background-color: #fff;
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
-    font-size: 40px;
+    font-size: 30px;
 }
 
 .answer {
@@ -46,7 +46,20 @@ body, html {
     font-size: 40px;
 }
 
-
+.bouton_question {
+    background-color: #2d2a83;
+    color: #fff;
+    font-size: 20px;
+    border: #333 ;
+    padding: 15px;
+    margin-top: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 h1 {
     color: #ccc0ff;
