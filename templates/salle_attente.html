@@ -10,7 +10,7 @@
     <div class="salle-attente-container">
         <div class="joueurs-liste">
             <h1>Salle d'attente</h1>
-            <p>Les joueurs inscrits :</p>
+            <p>Liste des joueurs :</p>
             <ul>
                 {% for joueur in joueurs %}
                     <li>{{ joueur }}</li>
@@ -23,6 +23,8 @@
                     <button type="submit">Démarrer la partie</button>
                 </form>
             </div>
+        {% else %}
+            <p>En attente du début de la partie...</p>
         {% endif %}
     </div>
 </body>

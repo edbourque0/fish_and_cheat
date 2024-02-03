@@ -14,17 +14,6 @@ def lire_points():
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
-def sauvegarder_points(points):
-    """Sauvegarder les points des joueurs dans le fichier JSON."""
-    with open(POINTS_FICHIER, 'w') as fichier:
-        json.dump(points, fichier)
-
-def ajouter_points(joueur, points_ajoutes):
-    """Ajouter des points pour un joueur spécifique."""
-    points = lire_points()
-    points[joueur] = points.get(joueur, 0) + points_ajoutes
-    sauvegarder_points(points)
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'une_cle_secrete_tres_secure'
 
