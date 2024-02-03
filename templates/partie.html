@@ -27,7 +27,7 @@
     <p class="role">Votre rôle : {{ role }}</p>
     {% if question %}
         <div>
-            <p class="question">{{ question['question'].replace('&quot;', '') }}</p>
+            <p class="question">{{ question['question'].replace('&quot;', '"') }}</p>
             {% if role != 'Lecteur' %}
                 <p class="answer">Réponse : {{ question['correct_answer'] }}</p>
             {% endif %}
