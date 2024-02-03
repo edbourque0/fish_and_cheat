@@ -1,0 +1,17 @@
+<!-- resultat.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Résultats de la Partie</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="result-container">
+        <h1>Résultats de la Partie</h1>
+        <p>Le tricheur était : {{ tricheur }}</p>
+        <p>Nombre de points accumulés : {{ points }}</p>
+        <button href="{{ url_for('partie') }}">Refaire une partie</button>
+    </div>
+</body>
+</html>

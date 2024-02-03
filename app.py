@@ -1,7 +1,29 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import requests
 import random
 import time
+import json
+
+POINTS_FICHIER = 'points.json'
+
+def lire_points():
+    """Lire les points des joueurs depuis le fichier JSON."""
+    try:
+        with open(POINTS_FICHIER, 'r') as fichier:
+            return json.load(fichier)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def sauvegarder_points(points):
+    """Sauvegarder les points des joueurs dans le fichier JSON."""
+    with open(POINTS_FICHIER, 'w') as fichier:
+        json.dump(points, fichier)
+
+def ajouter_points(joueur, points_ajoutes):
+    """Ajouter des points pour un joueur spécifique."""
+    points = lire_points()
+    points[joueur] = points.get(joueur, 0) + points_ajoutes
+    sauvegarder_points(points)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'une_cle_secrete_tres_secure'
@@ -10,6 +32,8 @@ joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
 partie_demarree = False
 question_actuelle = None  # Stocke la question actuelle et ses détails
+points = 0
+tricheur_revele = False
 
 def obtenir_question(max_retries=5):
     url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
@@ -36,6 +60,7 @@ def assigner_roles():
 
     for joueur in temp_players:
         roles[joueur] = 'Joueur'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -76,7 +101,37 @@ def partie():
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles)
+
+@app.route('/nouvelle_question', methods=['POST'])
+def nouvelle_question():
+    global question_actuelle
+    question_actuelle = obtenir_question()  # Obtenir une nouvelle question de l'API
+    if question_actuelle:
+        return redirect(url_for('partie'))
+    else:
+        # Gérer le cas où aucune question n'a pu être récupérée
+        return "Erreur lors de la récupération de la nouvelle question, veuillez réessayer.", 500
+
+@app.route('/verifier_joueur/<joueur>', methods=['POST'])
+def verifier_joueur(joueur):
+    global points, tricheur_revele
+    if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
+        return jsonify({"redirect": url_for('resultat')}), 200
+    if roles[joueur] == 'Tricheur':
+        tricheur_revele = True
+        return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
+    else:
+        points += 1
+        return jsonify({"result": "non-tricheur", "points": points}), 200
+
+
+@app.route('/resultat')
+def resultat():
+    tricheur = request.args.get('tricheur')
+    points = request.args.get('points')
+    return render_template('resultat.html', tricheur=tricheur, points=points)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=2828)

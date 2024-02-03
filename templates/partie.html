@@ -4,19 +4,47 @@
     <meta charset="UTF-8">
     <title>Partie en cours</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta http-equiv="refresh" content="5">
+    <script>
+        function verifierJoueur(nom) {
+            fetch('/verifier_joueur/' + nom, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect; // Redirection vers la page de résultats
+                    } else {
+                        alert(`Pas le tricheur. Points: ${data.points}`);
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+    </script>
+      
+    
 </head>
 <body>
     <h1 class="page-header">Partie en cours</h1>
-    <p>Votre rôle : {{ role }}</p>
+    <p class="role">Votre rôle : {{ role }}</p>
     {% if question %}
         <div class="question-et-reponse">
-            <p class="question">Question : {{ question['question'] }}</p>
+            <p class="question">{{ question['question'] }}</p>
             {% if role != 'Lecteur' %}
-                <p class="reponse">Réponse : {{ question['correct_answer'] }}</p>
-            {% else %}
-                <p>En tant que lecteur, la réponse ne vous est pas affichée.</p>
+                <p class="answer">Réponse : {{ question['correct_answer'] }}</p>
             {% endif %}
         </div>
+    {% endif %}
+    {% if role == 'Lecteur' %}
+    <form action="{{ url_for('nouvelle_question') }}" method="post">
+        <button type="submit">Obtenir une nouvelle question</button>
+    </form>
+    <div id="joueurs-buttons">
+        {% for joueur, joueur_role in roles.items() %}
+            {% if joueur != nom_joueur %}
+                <button onclick="verifierJoueur('{{ joueur }}')">{{ joueur }}</button>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <p>Points: <span id="points">0</span></p>
     {% endif %}
 </body>
 </html>

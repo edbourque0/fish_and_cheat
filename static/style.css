@@ -22,33 +22,29 @@ body, html {
     margin-top: 20px; /* Espacement entre les éléments */
 }
 
-.title, .role, .question, .answer {
+.title, .question {
     background: #fff;
     color: #333;
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
-}
-
-.title {
-    color: #ccc0ff;
-    font-size: 2em;
-    font-weight: bold;
-}
-
-.role {
-    color: #FF5733;
-    font-size: 1.2em;
-}
-
-.question {
-    font-size: 1.5em;
+    font-size: 40px;
 }
 
 .answer {
-    font-size: 1.5em;
-    color: #4CAF50;
-    display: none; /* La réponse est cachée par défaut */
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.role {
+    color: #ccc0ff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 40px;
 }
 
 
@@ -78,10 +74,11 @@ input[type="text"] {
 button, input[type="submit"] {
     background-color: #423dbf; /* Bouton de couleur vive */
     color: #fff;
+    font-size: 40px;
     border: none;
-    padding: 15px 20px;
-    margin-top: 20px;
-    border-radius: 5px;
+    padding: 25px 20px;
+    margin-top: 40px;
+    border-radius: 20px;
     cursor: pointer;
     width: 100%;
     box-sizing: border-box;
@@ -147,34 +144,4 @@ li {
 .page-content {
     text-align: center;
     padding-top: 30px;
-}
-
-
-.title, .role, .question, .answer {
-    background: #fff;
-    color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-.title {
-    color: #FFD700;
-    font-size: 2em;
-    font-weight: bold;
-}
-
-.role {
-    color: #FF5733;
-    font-size: 1.2em;
-}
-
-.question {
-    font-size: 1.5em;
-}
-
-.answer {
-    font-size: 1.5em;
-    color: #4CAF50;
-    display: none; /* La réponse est cachée par défaut */
 }
