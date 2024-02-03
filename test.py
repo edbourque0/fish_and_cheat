@@ -1,6 +1,22 @@
-def chooseliar(playernames):
-    chosenliar = random.randint(0, len(playernames)-1)
-    liar = playernames[chosenliar]
-    return liar
+import random
+players = ['Edouard', 'Catherine', 'William', 'Alexandre', 'Anthony', 'Isaac', 'Guillaume', 'René-Charles']
+roles = []
 
-print(chooseliar(['Edouard', 'Catherine', 'William', 'Alexandre']))
+def assigner_roles():
+    #Assigner tricheur
+    tricheur = random.choice(players)
+    newplayers.append((tricheur, 'Tricheur'))
+    players.pop(players.index(tricheur))
+
+    #Assigner lecteur
+    lecteur = random.choice(players)
+    newplayers.append((lecteur, 'lecteur'))
+    players.pop(players.index(lecteur))
+
+    #Assigner joueurs
+    for joueur in players:
+        newplayers.append((joueur, 'joueur'))
+        players.pop(players.index(joueur))
+
+assigner_roles()
+

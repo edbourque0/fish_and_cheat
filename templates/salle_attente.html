@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Salle d'attente</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        var socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
-
-        socket.on('connect', function() {
-            socket.emit('join', {nom: 'Le nom du joueur'}); // Tu devras remplacer cette partie par la logique pour récupérer le nom du joueur
-        });
-
-        socket.on('update_joueurs', function(data) {
-            var listeJoueurs = data.joueurs;
-            var html = '';
-            for (var i = 0; i < listeJoueurs.length; i++) {
-                html += '<li>' + listeJoueurs[i] + '</li>';
-            }
-            document.getElementById('liste-joueurs').innerHTML = html;
-        });
-    </script>
+    <!-- Rafraîchissement automatique toutes les 5 secondes -->
+    <meta http-equiv="refresh" content="5">
 </head>
 <body>
-    <ul id="liste-joueurs"></ul>
+    <h1>Salle d'attente</h1>
+    <p>Les joueurs inscrits :</p>
+    <ul>
+        {% for joueur in joueurs %}
+            <li>{{ joueur }}</li>
+        {% endfor %}
+    </ul>
+    {% if roles %}
+    <!-- Redirige vers la partie une fois que les rôles sont assignés -->
+    <script type="text/javascript">
+        window.location.href = "{{ url_for('partie') }}";
+    </script>
+    {% endif %}
 </body>
 </html>
