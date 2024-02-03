@@ -21,10 +21,7 @@ def obtenir_question(max_retries=5):
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            if data['results'][0]['question'][0:5] == 'Which':
-                obtenir_question()
-            else:
-                return data['results'][0]
+            return data['results'][0]
         else:
             print(f"Tentative {attempt + 1} échouée, statut {response.status_code}. Réessai dans 1 seconde...")
             time.sleep(1)
@@ -53,6 +50,12 @@ def reset_param():
         points = 0
         tricheur_revele = False
         tricheur = ''
+
+def assigner_points():
+    global points, roles, bleu_trouve
+    for joueur in joueurs:
+        if roles[joueur] == 'Tricheur' and bleu_trouve == 1:
+            points[joueur] = 1
 
 
 @app.route('/', methods=['GET', 'POST'])
