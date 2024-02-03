@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import requests
 import random
 import time
-import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '872y3r872h3e872h367r24gr23ge'
@@ -11,7 +10,8 @@ joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
 partie_demarree = False
 question_actuelle = None  # Stocke la question actuelle et ses détails
-points = 0
+points = {}
+retourne = {}
 tricheur_revele = False
 tricheur = ''
 
@@ -51,12 +51,21 @@ def reset_param():
         tricheur_revele = False
         tricheur = ''
 
-def assigner_points():
-    global points, roles, bleu_trouve
-    for joueur in joueurs:
-        if roles[joueur] == 'Tricheur' and bleu_trouve == 1:
-            points[joueur] = 1
+def retourner(role_retourne, joueur_retourne):
+    global retourne
+    retourne[joueur_retourne] = role_retourne
 
+def assigner_points():
+    global retourne, points, joueurs
+    for user in roles:
+        if roles[user] == 'Lecteur' and len(retourne) == len(joueurs)-2:
+            points[user] = len(joueurs)-1
+        elif roles[user] == 'Lecteur' and len(retourne) != len(joueurs)-2:
+            points[user] = 0
+        elif roles[user] == 'Tricheur' and user in retourne.keys() and len(retourne) < len(joueurs)-2:
+            points[user] = len(joueurs)-1 - len(retourne)
+        elif roles[user] == 'Joueur' and user not in retourne.keys():
+            points[user] = len(joueurs)-1 - len(retourne)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -82,7 +91,7 @@ def salle_attente():
 
 @app.route('/lancer_jeu', methods=['POST'])
 def lancer_jeu():
-    global partie_demarree, question_actuelle
+    global partie_demarree, question_actuelle, retourne
     if 'nom' in session and joueurs and session['nom'] == joueurs[0]:
         partie_demarree = True
         question_actuelle = obtenir_question()
@@ -116,21 +125,21 @@ def nouvelle_question():
 
 @app.route('/verifier_joueur/<joueur>', methods=['POST'])
 def verifier_joueur(joueur):
-    global points, tricheur_revele, tricheur
+    global points, tricheur_revele
     if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
-        tricheur = str(joueur)
+        assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:
-        points += 1
-        return jsonify({"result": "non-tricheur", "points": points}), 200
+        retourner(roles[joueur], joueur)
+        return jsonify({"result": "non-tricheur"}), 200
 
 
 @app.route('/resultat')
 def resultat():
-    global roles, tricheur
+    global points, tricheur
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
 
