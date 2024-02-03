@@ -4,9 +4,9 @@ Application web du jeux Fish and Cheat
 ## Utilisation
 
 Lancez le jeux sur chaque appareil à cet adresse :
-'''bash
+```bash
 http://__votre_ip_locale__:2828/
-'''
+```
 
 Chaque joueurs doit entrer son nom dans la barre et attendre que le premier joueur à s'être joint lance la partie avec le bouton "Démarrer la partie"
 
