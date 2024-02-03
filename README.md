@@ -13,4 +13,4 @@ Chaque joueurs doit entrer son nom dans la barre et attendre que le premier joue
 Pour réinitialiser les paramêtres par défaut du jeux et recommencer une partie, cliquez sur "Réinitialiser la partie"
 
 ## Règlements
-- [Règlements du jeux](https://www.gigamic.com/index.php?controller=attachment&id_attachment=381)
+[Règlements du jeux](https://www.gigamic.com/index.php?controller=attachment&id_attachment=381)
