@@ -14,6 +14,8 @@ points = {}
 retourne = {}
 tricheur_revele = False
 tricheur = ''
+game_number = 0
+
 
 def obtenir_question(max_retries=5):
     url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
@@ -40,24 +42,27 @@ def assigner_roles():
         roles[joueur] = 'Joueur'
 
 def reset_param():
-        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele
+        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, game_number
         joueurs = []
         roles = {}
         partie_demarree = False
         question_actuelle = None
-        points = 0
         tricheur_revele = False
         tricheur = ''
-        points = {}
+        init_points()
+        game_number = 0
 
 def retourner(role_retourne, joueur_retourne):
     global retourne
     retourne[joueur_retourne] = role_retourne
 
+def init_points():
+        global roles, points
+        for user in roles:
+            points[user] = 0
+
 def assigner_points():
     global retourne, points, joueurs
-    for user in roles:
-        points[user] = 0
     for user in roles:
         if roles[user] == 'Lecteur' and len(retourne) == len(joueurs)-2:
             points[user] += len(joueurs)-1
@@ -73,7 +78,6 @@ def assigner_points():
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global tricheur_revele
-
     if request.method == 'POST':
         nom_joueur = request.form.get('nom')
         tricheur_revele = False
@@ -131,12 +135,15 @@ def nouvelle_question():
 
 @app.route('/verifier_joueur/<joueur>', methods=['POST'])
 def verifier_joueur(joueur):
-    global points, tricheur_revele, tricheur
+    global points, tricheur_revele, tricheur, game_number
     if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
         tricheur = joueur
+        if game_number == 0:
+            init_points()
+            game_number += 1
         assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:
