@@ -50,6 +50,7 @@ def reset_param():
         points = 0
         tricheur_revele = False
         tricheur = ''
+        points = {}
 
 def retourner(role_retourne, joueur_retourne):
     global retourne
@@ -59,13 +60,15 @@ def assigner_points():
     global retourne, points, joueurs
     for user in roles:
         if roles[user] == 'Lecteur' and len(retourne) == len(joueurs)-2:
-            points[user] = len(joueurs)-1
+            points[user] += len(joueurs)-1
         elif roles[user] == 'Lecteur' and len(retourne) != len(joueurs)-2:
-            points[user] = 0
+            points[user] += 0
         elif roles[user] == 'Tricheur' and user in retourne.keys() and len(retourne) < len(joueurs)-2:
-            points[user] = len(joueurs)-1 - len(retourne)
+            points[user] += len(joueurs)-1 - len(retourne)
         elif roles[user] == 'Joueur' and user not in retourne.keys():
-            points[user] = len(joueurs)-1 - len(retourne)
+            points[user] += len(joueurs)-1 - len(retourne)
+        else:
+            points[user] += 0
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -125,11 +128,12 @@ def nouvelle_question():
 
 @app.route('/verifier_joueur/<joueur>', methods=['POST'])
 def verifier_joueur(joueur):
-    global points, tricheur_revele
+    global points, tricheur_revele, tricheur
     if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
+        tricheur = joueur
         assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:
@@ -142,6 +146,5 @@ def resultat():
     global points, tricheur
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
-
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=2828)
+    app.run(debug=True, host='0.0.0.0', port=2827)

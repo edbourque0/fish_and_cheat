@@ -34,6 +34,8 @@ def assigner_points():
             points[user] = len(joueurs)-1 - len(retourne)
         elif roles[user] == 'Joueur' and user not in retourne.keys():
             points[user] = len(joueurs)-1 - len(retourne)
+        else:
+            points[user] = 0
 
 assigner_roles()
 retourner('Joueur', 'Julien')
