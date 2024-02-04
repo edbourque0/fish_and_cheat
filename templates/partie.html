@@ -47,11 +47,5 @@
     </div>
     <p></p>
     {% endif %}
-    {% if tricheur_revele == True %}
-        <h2>La partie est terminée</h2>
-        <form action="{{ url_for('resultat') }}" method="get">
-            <button type="submit">Voir les résultats</button>
-        </form>
-    {% endif %}
 </body>
 </html>

@@ -33,11 +33,9 @@ def assigner_roles():
     tricheur = random.choice(temp_players)
     roles[tricheur] = 'Tricheur'
     temp_players.remove(tricheur)
-
     lecteur = random.choice(temp_players)
     roles[lecteur] = 'Lecteur'
     temp_players.remove(lecteur)
-
     for joueur in temp_players:
         roles[joueur] = 'Joueur'
 
@@ -59,6 +57,8 @@ def retourner(role_retourne, joueur_retourne):
 def assigner_points():
     global retourne, points, joueurs
     for user in roles:
+        points[user] = 0
+    for user in roles:
         if roles[user] == 'Lecteur' and len(retourne) == len(joueurs)-2:
             points[user] += len(joueurs)-1
         elif roles[user] == 'Lecteur' and len(retourne) != len(joueurs)-2:
@@ -72,8 +72,11 @@ def assigner_points():
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    global tricheur_revele
+
     if request.method == 'POST':
         nom_joueur = request.form.get('nom')
+        tricheur_revele = False
         if nom_joueur and nom_joueur not in joueurs:
             joueurs.append(nom_joueur)
             session['nom'] = nom_joueur
@@ -95,8 +98,8 @@ def salle_attente():
 @app.route('/lancer_jeu', methods=['POST'])
 def lancer_jeu():
     global partie_demarree, question_actuelle, retourne
+    partie_demarree = True
     if 'nom' in session and joueurs and session['nom'] == joueurs[0]:
-        partie_demarree = True
         question_actuelle = obtenir_question()
         if question_actuelle:
             assigner_roles()
@@ -109,8 +112,8 @@ def lancer_jeu():
 
 @app.route('/partie')
 def partie():
-    if not partie_demarree or 'nom' not in session:
-        return redirect(url_for('salle_attente'))
+    if tricheur_revele:
+        return redirect(url_for('resultat'))
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
@@ -143,7 +146,8 @@ def verifier_joueur(joueur):
 
 @app.route('/resultat')
 def resultat():
-    global points, tricheur
+    global points, tricheur, partie_demarree
+    partie_demarree = False
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
 if __name__ == '__main__':
