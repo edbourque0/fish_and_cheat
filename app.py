@@ -16,7 +16,6 @@ tricheur_revele = False
 tricheur = ''
 game_number = 0
 
-
 def obtenir_question(max_retries=5):
     url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
     for attempt in range(max_retries):
@@ -158,4 +157,4 @@ def resultat():
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=2827)
+    app.run(debug=True, host='0.0.0.0', port=2828)
