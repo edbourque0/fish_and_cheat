@@ -157,4 +157,4 @@ def resultat():
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=2828)
+    app.run(debug=True, host='0.0.0.0', port=2827)
