@@ -3,19 +3,21 @@ import requests
 import random
 import time
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '872y3r872h3e872h367r24gr23ge'
 
 joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
-partie_demarree = False
+partie_demarree = False #Variable pour savoir si la partie est commencée
 question_actuelle = None  # Stocke la question actuelle et ses détails
-points = {}
-retourne = {}
-tricheur_revele = False
-tricheur = ''
-game_number = 0
+points = {} #Dictionnaire pour stocker les points des joueurs
+retourne = {} #Dictionnaire pour stocker les joueurs retournés lors de la partie
+tricheur_revele = False #Variable pour savoir si le tricheur a été révélé
+tricheur = '' #Variable pour stocker le nom du tricheur temporairement
+game_number = 0 #Nombre de parties jouées depuis la dernière réinitialisation
 
+#Va chercher la question sur l'API de opentdb
 def obtenir_question(max_retries=5):
     url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
     for attempt in range(max_retries):
@@ -28,6 +30,7 @@ def obtenir_question(max_retries=5):
             time.sleep(1)
     return None
 
+#Assigne les roles aux joueurs
 def assigner_roles():
     global roles
     temp_players = joueurs[:]
@@ -40,6 +43,7 @@ def assigner_roles():
     for joueur in temp_players:
         roles[joueur] = 'Joueur'
 
+#Fonction pour reseter les paramêtres pour pouvoir jouer une nouvelle partie
 def reset_param():
         global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, game_number
         joueurs = []
@@ -51,15 +55,18 @@ def reset_param():
         init_points()
         game_number = 0
 
+#Fonction pour retourner un joueur
 def retourner(role_retourne, joueur_retourne):
     global retourne
     retourne[joueur_retourne] = role_retourne
 
+#Assigner 0 points à tout les joueurs
 def init_points():
         global roles, points
         for user in roles:
             points[user] = 0
 
+#Assigner les points de la partie aux joueurs
 def assigner_points():
     global retourne, points, joueurs
     for user in roles:
@@ -148,7 +155,6 @@ def verifier_joueur(joueur):
     else:
         retourner(roles[joueur], joueur)
         return jsonify({"result": "non-tricheur"}), 200
-
 
 @app.route('/resultat')
 def resultat():
