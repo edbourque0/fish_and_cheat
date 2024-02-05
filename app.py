@@ -81,16 +81,26 @@ def assigner_points():
         else:
             points[user] += 0
 
+#Vérifier qu'un nouveau joueur n'est pas ajouté lors d'une partie
+def verifier_nouveau_joueur(nom):
+    if game_number > 0 and nom not in joueurs:
+        return False
+    else:
+        return True
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global tricheur_revele
     if request.method == 'POST':
         nom_joueur = request.form.get('nom')
         tricheur_revele = False
-        if nom_joueur and nom_joueur not in joueurs:
-            joueurs.append(nom_joueur)
-            session['nom'] = nom_joueur
-        return redirect(url_for('salle_attente'))
+        if verifier_nouveau_joueur(nom_joueur) == True:
+            if nom_joueur and nom_joueur not in joueurs:
+                joueurs.append(nom_joueur)
+                session['nom'] = nom_joueur
+            return redirect(url_for('salle_attente'))
+        else:
+            return render_template('index.html', message=True)
     return render_template('index.html')
 
 @app.route('/reset', methods=['POST'])

@@ -13,10 +13,14 @@
             <input type="text" id="nom" name="nom" required>
         <button type="submit">Rejoindre</button>
     </form>
+    {% if message == True %}
+    <p class="message_erreur">Ce joueur n'existe pas dans la partie, veuillez entrer un autre nom ou créer une nouvelle partie</p>
+    {% else %}
     <p></p>
+    {% endif %}
     <p></p>
     <form action="{{ url_for('reset') }} " method="POST">
-        <button class="reset" type="submit">Réinitialiser une partie</button>
+        <button class="reset" type="submit">Créer une nouvelle partie</button>
     </form>
 </body>
 </html>

@@ -190,3 +190,8 @@ p {
     align-items: center;
     justify-content: center;
 }
+
+.message_erreur {
+    color: #ff0000;
+    text-align: center;
+}
