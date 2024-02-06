@@ -46,15 +46,16 @@ def assigner_roles():
 
 #Fonction pour reseter les paramêtres pour pouvoir jouer une nouvelle partie
 def reset_param():
-        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, round_number
-        joueurs = []
-        roles = {}
-        partie_demarree = False
-        question_actuelle = None
-        tricheur_revele = False
-        tricheur = ''
-        init_points()
-        round_number = 0
+        if len(joueurs_en_attente) == 0:
+            global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, round_number
+            joueurs = []
+            roles = {}
+            partie_demarree = False
+            question_actuelle = None
+            tricheur_revele = False
+            tricheur = ''
+            init_points()
+            round_number = 0
 
 #Fonction pour retourner un joueur
 def retourner(role_retourne, joueur_retourne):
@@ -106,7 +107,7 @@ def home():
             return redirect(url_for('salle_attente'))
         else:
             return render_template('index.html', message=True)
-    return render_template('index.html')
+    return render_template('index.html', nbattente=len(joueurs_en_attente))
 
 @app.route('/reset', methods=['POST'])
 def reset():
@@ -118,7 +119,6 @@ def salle_attente():
     global tricheur_revele
     tricheur_revele = False
     attendre(session['nom'])
-    print(joueurs_en_attente)
     if partie_demarree:
         return redirect(url_for('partie'))
     premier_joueur = joueurs[0] if joueurs else None
@@ -127,15 +127,18 @@ def salle_attente():
 @app.route('/lancer_jeu', methods=['POST'])
 def lancer_jeu():
     global partie_demarree, question_actuelle, retourne
-    partie_demarree = True
     if 'nom' in session and joueurs and session['nom'] == joueurs[0]:
         question_actuelle = obtenir_question()
-        if question_actuelle:
-            assigner_roles()
-            return redirect(url_for('partie'))
+        if len(joueurs_en_attente) == len(joueurs):
+            if question_actuelle:
+                partie_demarree = True
+                assigner_roles()
+                return redirect(url_for('partie'))
+            else:
+                partie_demarree = False
+                return "Erreur lors de la récupération de la question, veuillez réessayer.", 500
         else:
-            partie_demarree = False
-            return "Erreur lors de la récupération de la question, veuillez réessayer.", 500
+            return redirect(url_for('salle_attente'))
     return redirect(url_for('salle_attente'))
 
 @app.route('/partie')

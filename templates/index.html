@@ -5,6 +5,7 @@
     <title>Rejoindre la partie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta http-equiv="refresh" content="10">
 </head>
 <body>
     <h1>Fish and cheat</h1>
@@ -19,8 +20,10 @@
     <p></p>
     {% endif %}
     <p></p>
+    {% if nbattente == 0 %}
     <form action="{{ url_for('reset') }} " method="POST">
         <button class="reset" type="submit">Créer une nouvelle partie</button>
     </form>
+    {% endif %}
 </body>
 </html>

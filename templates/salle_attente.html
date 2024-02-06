@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Salle d'attente</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="2">
 </head>
 <body>
     <div class="salle-attente-container">
@@ -22,13 +22,13 @@
                 <form action="{{ url_for('lancer_jeu') }}" method="post">
                     <button type="submit">Démarrer la partie</button>
                 </form>
-                {% if joueurs_en_attente != nbjoueurs %}
-                <p class="message_erreur">Veuillez attendre que tout les joueurs aient rejoint la salle d'attente</p>
-                {% endif %}
             </div>
         {% else %}
             <p>En attente du début de la partie...</p>
         {% endif %}
     </div>
+    {% if joueurs_en_attente != nbjoueurs %}
+    <p class="message_erreur">Veuillez attendre que tout les joueurs aient rejoint la salle d'attente</p>
+    {% endif %}
 </body>
 </html>
