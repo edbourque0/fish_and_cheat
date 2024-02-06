@@ -11,14 +11,19 @@
         <h1>Résultats de la Partie</h1>
         <p>Le tricheur était : {{ tricheur }}</p>
         {% if points[session['nom']] != 0 %}
-            <p>Vous avez {{ points[session['nom']] }} points</p>
+            <p class=text_centre>Vous avez {{ points[session['nom']] }} points</p>
         {% else %}
-            <p>Vous avez 0 points</p>
+            <p class=text_centre>Vous avez 0 points</p>
         {% endif %}
         <div></div>
-        <form action="{{ url_for('home') }}" method="get">
+        <form action="{{ url_for('salle_attente') }}" method="get">
             <button type="submit">Prochaine round</button>
         </form>
+        <p></p>
+        <p></p>
     </div>
+    <form action="{{ url_for('reset') }} " method="POST">
+        <button class="reset" type="submit">Créer une nouvelle partie</button>
+    </form>
 </body>
 </html>

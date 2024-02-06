@@ -15,7 +15,8 @@ points = {} #Dictionnaire pour stocker les points des joueurs
 retourne = {} #Dictionnaire pour stocker les joueurs retournés lors de la partie
 tricheur_revele = False #Variable pour savoir si le tricheur a été révélé
 tricheur = '' #Variable pour stocker le nom du tricheur temporairement
-game_number = 0 #Nombre de parties jouées depuis la dernière réinitialisation
+round_number = 0 #Nombre de round jouées dans la partie
+joueurs_en_attente = []
 
 #Va chercher la question sur l'API de opentdb
 def obtenir_question(max_retries=5):
@@ -45,7 +46,7 @@ def assigner_roles():
 
 #Fonction pour reseter les paramêtres pour pouvoir jouer une nouvelle partie
 def reset_param():
-        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, game_number
+        global joueurs, roles, partie_demarree, question_actuelle, points, tricheur, tricheur_revele, round_number
         joueurs = []
         roles = {}
         partie_demarree = False
@@ -53,7 +54,7 @@ def reset_param():
         tricheur_revele = False
         tricheur = ''
         init_points()
-        game_number = 0
+        round_number = 0
 
 #Fonction pour retourner un joueur
 def retourner(role_retourne, joueur_retourne):
@@ -83,17 +84,21 @@ def assigner_points():
 
 #Vérifier qu'un nouveau joueur n'est pas ajouté lors d'une partie
 def verifier_nouveau_joueur(nom):
-    if game_number > 0 and nom not in joueurs:
+    if round_number > 0 and nom not in joueurs:
         return False
     else:
         return True
+    
+def attendre(nom):
+    if nom not in joueurs_en_attente:
+        joueurs_en_attente.append(nom)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global tricheur_revele
     if request.method == 'POST':
         nom_joueur = request.form.get('nom')
-        tricheur_revele = False
         if verifier_nouveau_joueur(nom_joueur) == True:
             if nom_joueur and nom_joueur not in joueurs:
                 joueurs.append(nom_joueur)
@@ -110,10 +115,14 @@ def reset():
 
 @app.route('/salle_attente')
 def salle_attente():
+    global tricheur_revele
+    tricheur_revele = False
+    attendre(session['nom'])
+    print(joueurs_en_attente)
     if partie_demarree:
         return redirect(url_for('partie'))
     premier_joueur = joueurs[0] if joueurs else None
-    return render_template('salle_attente.html', joueurs=joueurs, joueur_session=session.get('nom'), premier_joueur=premier_joueur)
+    return render_template('salle_attente.html', joueurs=joueurs, joueur_session=session.get('nom'), premier_joueur=premier_joueur, joueurs_en_attente=len(joueurs_en_attente), nbjoueurs=len(joueurs))
 
 @app.route('/lancer_jeu', methods=['POST'])
 def lancer_jeu():
@@ -125,19 +134,20 @@ def lancer_jeu():
             assigner_roles()
             return redirect(url_for('partie'))
         else:
-            # Gérer le cas où aucune question n'a pu être récupérée
-            partie_demarree = False  # Réinitialiser si la récupération échoue
+            partie_demarree = False
             return "Erreur lors de la récupération de la question, veuillez réessayer.", 500
     return redirect(url_for('salle_attente'))
 
 @app.route('/partie')
 def partie():
+    global joueurs_en_attente
+    joueurs_en_attente.clear()
     if tricheur_revele:
         return redirect(url_for('resultat'))
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele = tricheur_revele, points=points)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele=tricheur_revele)
 
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
@@ -151,15 +161,15 @@ def nouvelle_question():
 
 @app.route('/verifier_joueur/<joueur>', methods=['POST'])
 def verifier_joueur(joueur):
-    global points, tricheur_revele, tricheur, game_number
+    global points, tricheur_revele, tricheur, round_number
     if tricheur_revele:  # Si le tricheur a déjà été révélé, ne rien faire
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
         tricheur = joueur
-        if game_number == 0:
+        if round_number == 0:
             init_points()
-            game_number += 1
+            round_number += 1
         assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:

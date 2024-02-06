@@ -22,6 +22,9 @@
                 <form action="{{ url_for('lancer_jeu') }}" method="post">
                     <button type="submit">Démarrer la partie</button>
                 </form>
+                {% if joueurs_en_attente != nbjoueurs %}
+                <p class="message_erreur">Veuillez attendre que tout les joueurs aient rejoint la salle d'attente</p>
+                {% endif %}
             </div>
         {% else %}
             <p>En attente du début de la partie...</p>
