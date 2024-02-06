@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_socketio import SocketIO, emit, send
 import requests
 import random
 import time
@@ -6,6 +7,7 @@ import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '872y3r872h3e872h367r24gr23ge'
+socketio = SocketIO(app, logger=True)
 
 joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
@@ -107,7 +109,7 @@ def home():
             return redirect(url_for('salle_attente'))
         else:
             return render_template('index.html', message=True)
-    return render_template('index.html', nbattente=len(joueurs_en_attente))
+    return render_template('index.html', nbattente=len(joueurs_en_attente), round_number=round_number)
 
 @app.route('/reset', methods=['POST'])
 def reset():
@@ -118,6 +120,7 @@ def reset():
 def salle_attente():
     global tricheur_revele
     tricheur_revele = False
+    socketio.emit('Joueur en attente')
     attendre(session['nom'])
     if partie_demarree:
         return redirect(url_for('partie'))
@@ -145,6 +148,7 @@ def lancer_jeu():
 def partie():
     global joueurs_en_attente
     joueurs_en_attente.clear()
+    socketio.emit('Plus de joueurs en attente', len(joueurs_en_attente))
     if tricheur_revele:
         return redirect(url_for('resultat'))
     nom_joueur = session['nom']
@@ -185,5 +189,13 @@ def resultat():
     partie_demarree = False
     return render_template('resultat.html', tricheur=tricheur, points=points)
 
+@socketio.on('connect')
+def handle_connect():
+    print('Nouveau joueur connecté!')
+
+@socketio.on('Joueur en attente')
+def attente():
+    print('Joueur en attente')
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=2827)
+    socketio.run(app, debug=True, host='0.0.0.0', port=2827)
