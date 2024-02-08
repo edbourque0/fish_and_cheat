@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
-<meta http-equiv="refresh" content="5">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    const socket = io.connect("http://192.168.2.39:2827");
+    socket.on('Joueur en attente', function() {
+        // Sélectionner le bouton par son ID et le retirer
+        var boutonNouvellePartie = document.getElementById("boutonNouvellePartie");
+        if (boutonNouvellePartie) {
+            boutonNouvellePartie.parentNode.removeChild(boutonNouvellePartie);
+        }
+    });
+</script>
 <head>
     <meta charset="UTF-8">
     <title>Rejoindre la partie</title>
@@ -9,11 +19,13 @@
 </head>
 <body>
     <h1>Fish and cheat</h1>
-    <form method="post">
-        <label for="nom">Entrez votre nom :</label>
-            <input type="text" id="nom" name="nom" required>
-        <button type="submit">Rejoindre</button>
-    </form>
+    <div class='name_form'>
+        <form method="post">
+            <label for="nom">Entrez votre nom :</label>
+                <input type="text" id="nom" name="nom" required>
+            <button class='bouton_retourne' type="submit">Rejoindre</button>
+        </form>
+    </div>
     {% if message == True %}
     <p class="message_erreur">Ce joueur n'existe pas dans la partie, veuillez entrer un autre nom ou créer une nouvelle partie</p>
     {% else %}
@@ -21,7 +33,10 @@
     {% endif %}
     <p></p>
     {% if nbattente == 0 %}
-    <form id='nouvelle_partie' action="{{ url_for('reset') }} " method="POST"><button class="reset" type="submit">Créer une nouvelle partie</button></form>
+    <form id='nouvelle_partie' action="{{ url_for('reset') }} " method="POST">
+        <button id="boutonNouvellePartie" class="reset" type="submit">Créer une nouvelle partie</button>
+    </form>
     {% endif %}
+    
 </body>
 </html>

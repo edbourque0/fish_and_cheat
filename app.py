@@ -22,7 +22,7 @@ joueurs_en_attente = []
 
 #Va chercher la question sur l'API de opentdb
 def obtenir_question(max_retries=5):
-    url = "https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple"
+    url = "https://opentdb.com/api.php?amount=1&type=multiple"
     for attempt in range(max_retries):
         response = requests.get(url)
         if response.status_code == 200:
@@ -45,6 +45,7 @@ def assigner_roles():
     temp_players.remove(lecteur)
     for joueur in temp_players:
         roles[joueur] = 'Joueur'
+    
 
 #Fonction pour reseter les paramêtres pour pouvoir jouer une nouvelle partie
 def reset_param():
@@ -63,6 +64,7 @@ def reset_param():
 def retourner(role_retourne, joueur_retourne):
     global retourne
     retourne[joueur_retourne] = role_retourne
+    socketio.emit('Joueur retourne', {'joueur': joueur_retourne, 'role': role_retourne})
 
 #Assigner 0 points à tout les joueurs
 def init_points():
@@ -84,6 +86,7 @@ def assigner_points():
             points[user] += len(joueurs)-1 - len(retourne)
         else:
             points[user] += 0
+    print(points)
 
 #Vérifier qu'un nouveau joueur n'est pas ajouté lors d'une partie
 def verifier_nouveau_joueur(nom):
@@ -96,7 +99,6 @@ def attendre(nom):
     if nom not in joueurs_en_attente:
         joueurs_en_attente.append(nom)
 
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global tricheur_revele
@@ -108,6 +110,7 @@ def home():
                 session['nom'] = nom_joueur
             return redirect(url_for('salle_attente'))
         else:
+            socketio.emit('Nouvelle partie')
             return render_template('index.html', message=True)
     return render_template('index.html', nbattente=len(joueurs_en_attente), round_number=round_number)
 
@@ -120,7 +123,7 @@ def reset():
 def salle_attente():
     global tricheur_revele
     tricheur_revele = False
-    socketio.emit('Joueur en attente')
+    socketio.emit('Joueur en attente', joueurs)
     attendre(session['nom'])
     if partie_demarree:
         return redirect(url_for('partie'))
@@ -154,13 +157,14 @@ def partie():
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele=tricheur_revele)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele=tricheur_revele, round_number=round_number)
 
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
     global question_actuelle
-    question_actuelle = obtenir_question()  # Obtenir une nouvelle question de l'API
+    question_actuelle = obtenir_question()
     if question_actuelle:
+        socketio.emit('Nouvelle question')
         return redirect(url_for('partie'))
     else:
         # Gérer le cas où aucune question n'a pu être récupérée
@@ -173,11 +177,11 @@ def verifier_joueur(joueur):
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
-        socketio.emit('Tricheur revélé', boadcast=True)
+        socketio.emit('Tricheur revélé')
         tricheur = joueur
         if round_number == 0:
             init_points()
-            round_number += 1
+        round_number += 1
         assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:
@@ -194,9 +198,6 @@ def resultat():
 def handle_connect():
     print('Nouveau joueur connecté!')
 
-@socketio.on('Joueur en attente')
-def attente():
-    print('Joueur en attente')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=2827)

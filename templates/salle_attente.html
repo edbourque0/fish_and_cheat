@@ -2,43 +2,52 @@
 <html lang="fr">
 <meta http-equiv="refresh" content="5">
 <head>
-<meta charset="UTF-8">
-<title>Salle d'attente</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-<script type="text/javascript">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salle d'attente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript">
     const socket = io.connect("http://192.168.2.39:2827");
-    socket.on('Joueur en attente', function() {
-        location.reload();
+    socket.on('Joueur en attente', function(joueurs) {
+        const listeJoueurs = document.querySelector('ul');
+        listeJoueurs.innerHTML = ''; // Vide la liste actuelle
+
+        joueurs.forEach(joueur => { // Ajoute chaque joueur mis à jour à la liste
+            const li = document.createElement('li');
+            li.textContent = joueur;
+            listeJoueurs.appendChild(li);
+        });
     });
     socket.on('Partie commencée', function() {
         location.reload();
     });
-</script>
+    </script>
 </head>
 <body>
-    <div class="salle-attente-container">
-        <div class="joueurs-liste">
-            <h1>Salle d'attente</h1>
-            <p>Liste des joueurs :</p>
+    <div>
+        <h1>Salle d'attente</h1>
+        <p class=gros_role>{{session['nom']}}</p>
+        <section>
+            <h2>Liste des joueurs :</h2>
             <ul>
                 {% for joueur in joueurs %}
-                    <li>{{ joueur }}</li>
+                <li>{{ joueur }}</li>
                 {% endfor %}
             </ul>
-        </div>
+        </section>
         {% if joueur_session == premier_joueur %}
-            <div class="footer">
-                <form action="{{ url_for('lancer_jeu') }}" method="post">
-                    <button type="submit">Démarrer la partie</button>
-                </form>
-            </div>
+        <div>
+            <form action="{{ url_for('lancer_jeu') }}" method="post">
+                <button type="submit" class="start-game">Démarrer la partie</button>
+            </form>
+        </div>
         {% else %}
-            <p>En attente du début de la partie...</p>
+        <p>En attente du début de la partie...</p>
+        {% endif %}
+        {% if joueurs_en_attente != nbjoueurs %}
+        <p class="message_erreur">Veuillez attendre que tous les joueurs aient rejoint la salle d'attente.</p>
         {% endif %}
     </div>
-    {% if joueurs_en_attente != nbjoueurs %}
-    <p class="message_erreur">Veuillez attendre que tout les joueurs aient rejoint la salle d'attente</p>
-    {% endif %}
 </body>
 </html>

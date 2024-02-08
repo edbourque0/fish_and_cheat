@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
-<meta http-equiv="refresh" content="5">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    const socket = io.connect("http://192.168.2.39:2827");
+    socket.on('Nouvelle round', function() {
+        location.reload();
+    });
+    socket.on('Nouvelle partie', function() {
+        window.location.href = '/';
+    });
+</script>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=0.7">
     <title>Résultats de la Partie</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="result-container">
-        <h1>Résultats de la Partie</h1>
-        <p>Le tricheur était : {{ tricheur }}</p>
-        {% if points[session['nom']] != 0 %}
-            <p class=text_centre>Vous avez {{ points[session['nom']] }} points</p>
-        {% else %}
-            <p class=text_centre>Vous avez 0 points</p>
-        {% endif %}
+        <h1>Résultats de la partie</h1>
+            <p class=text_centre>Le tricheur était : <span class='gros_role'>{{ tricheur }}</span></p>
+            <p class=text_centre>Vous avez <span class='gros_role'>{{ points[session['nom']] }}</span> points</p>
         <div></div>
         <form action="{{ url_for('salle_attente') }}" method="get">
-            <button type="submit">Prochaine round</button>
+            <button class='bouton_retourne' type="submit">Prochaine round</button>
         </form>
         <p></p>
         <p></p>
