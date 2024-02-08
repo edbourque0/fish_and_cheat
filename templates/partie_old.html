@@ -9,14 +9,10 @@
     socket.on('Nouvelle question', function() {
         window.location.href = '/partie';
     });
-    socket.on('Joueur retourne', function() {
-        window.location.href = '/partie';
-    });
 </script>
 <head>
     <meta charset="UTF-8">
     <title>Partie en cours</title>
-    <meta name="viewport" content="initial-scale=0.7">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
         function verifierJoueur(nom) {
@@ -32,13 +28,15 @@
                 .catch(error => console.error('Erreur:', error));
         }
     </script>
+    
+    
 </head>
 <body>
-    <h1 class="page-header">Round {{ round_number + 1}}</h1>
-    <p class="text_role">Rôle :  <span class='gros_role'>{{ role }}</span></p>
+    <h1 class="page-header">Partie en cours</h1>
+    <p class="role">Votre rôle : {{ role }}</p>
     {% if question %}
-        <div class='div_question'>
-            <p class="bulle_question">{{ question['question'].replace('&quot;', '"').replace('&#039;', "'") }}</p>
+        <div>
+            <p class="question">{{ question['question'].replace('&quot;', '"') }}</p>
             {% if role != 'Lecteur' %}
                 <p class="answer">Réponse : {{ question['correct_answer'] }}</p>
             {% endif %}
@@ -48,13 +46,11 @@
     <form action="{{ url_for('nouvelle_question') }}" method="post">
         <button class="bouton_question" type="submit">Obtenir une nouvelle question</button>
     </form>
-    <p></p>
-    <p></p>
-    <p class="text_tricheur">Joueurs non révélés:</p>
-    <div class="joueurs-buttons">
+    <p class="text_tricheur">Cliquez sur le joueur que vous croyez être le tricheur:</p>
+    <div id="joueurs-buttons">
         {% for joueur, joueur_role in roles.items() %}
             {% if joueur != nom_joueur %}
-                <button class='bouton_retourne' onclick="verifierJoueur('{{ joueur }}')">{{ joueur }}</button>
+                <button onclick="verifierJoueur('{{ joueur }}')">{{ joueur }}</button>
             {% endif %}
         {% endfor %}
     </div>

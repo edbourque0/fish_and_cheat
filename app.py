@@ -11,6 +11,7 @@ socketio = SocketIO(app, logger=True)
 
 joueurs = []  # Liste pour stocker les noms des joueurs inscrits
 roles = {}    # Dictionnaire pour stocker les rôles des joueurs
+# roles_temp = roles
 partie_demarree = False #Variable pour savoir si la partie est commencée
 question_actuelle = None  # Stocke la question actuelle et ses détails
 points = {} #Dictionnaire pour stocker les points des joueurs
@@ -63,6 +64,8 @@ def reset_param():
 def retourner(role_retourne, joueur_retourne):
     global retourne
     retourne[joueur_retourne] = role_retourne
+    # roles_temp.pop(joueur_retourne)
+    socketio.emit('Joueur retourne')
 
 #Assigner 0 points à tout les joueurs
 def init_points():
@@ -95,7 +98,6 @@ def verifier_nouveau_joueur(nom):
 def attendre(nom):
     if nom not in joueurs_en_attente:
         joueurs_en_attente.append(nom)
-
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -155,7 +157,7 @@ def partie():
     nom_joueur = session['nom']
     role_joueur = roles.get(nom_joueur, 'Joueur')
     afficher_reponse = role_joueur in ['Joueur', 'Tricheur']
-    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele=tricheur_revele)
+    return render_template('partie.html', role=role_joueur, question=question_actuelle, afficher_reponse=afficher_reponse, nom_joueur=nom_joueur, roles=roles, tricheur_revele=tricheur_revele, round_number=round_number)
 
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
@@ -177,9 +179,7 @@ def verifier_joueur(joueur):
         tricheur_revele = True
         socketio.emit('Tricheur revélé')
         tricheur = joueur
-        if round_number == 0:
-            init_points()
-            round_number += 1
+        round_number += 1
         assigner_points()
         return jsonify({"redirect": url_for('resultat', tricheur=joueur, points=points)}), 200
     else:

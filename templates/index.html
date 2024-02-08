@@ -21,11 +21,13 @@
 </head>
 <body>
     <h1>Fish and cheat</h1>
-    <form method="post">
-        <label for="nom">Entrez votre nom :</label>
-            <input type="text" id="nom" name="nom" required>
-        <button type="submit">Rejoindre</button>
-    </form>
+    <div class='name_form'>
+        <form method="post">
+            <label for="nom">Entrez votre nom :</label>
+                <input type="text" id="nom" name="nom" required>
+            <button class='bouton_retourne' type="submit">Rejoindre</button>
+        </form>
+    </div>
     {% if message == True %}
     <p class="message_erreur">Ce joueur n'existe pas dans la partie, veuillez entrer un autre nom ou créer une nouvelle partie</p>
     {% else %}

@@ -17,8 +17,8 @@
 </head>
 <body>
     <div class="result-container">
-        <h1>Résultats de la Partie</h1>
-        <p>Le tricheur était : {{ tricheur }}</p>
+        <h1>Résultats de la partie</h1>
+            <p class=text_centre>Le tricheur était : {{ tricheur }}</p>
         {% if points[session['nom']] != 0 %}
             <p class=text_centre>Vous avez {{ points[session['nom']] }} points</p>
         {% else %}
