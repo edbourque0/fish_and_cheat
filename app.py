@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit
 import requests
 import random
 import time
@@ -135,6 +135,7 @@ def lancer_jeu():
         if len(joueurs_en_attente) == len(joueurs):
             if question_actuelle:
                 partie_demarree = True
+                socketio.emit('Partie commencée')
                 assigner_roles()
                 return redirect(url_for('partie'))
             else:
@@ -148,7 +149,6 @@ def lancer_jeu():
 def partie():
     global joueurs_en_attente
     joueurs_en_attente.clear()
-    socketio.emit('Plus de joueurs en attente', len(joueurs_en_attente))
     if tricheur_revele:
         return redirect(url_for('resultat'))
     nom_joueur = session['nom']
@@ -173,6 +173,7 @@ def verifier_joueur(joueur):
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
+        socketio.emit('Tricheur revélé', boadcast=True)
         tricheur = joueur
         if round_number == 0:
             init_points()
