@@ -108,6 +108,7 @@ def home():
                 session['nom'] = nom_joueur
             return redirect(url_for('salle_attente'))
         else:
+            socketio.emit('Nouvelle partie')
             return render_template('index.html', message=True)
     return render_template('index.html', nbattente=len(joueurs_en_attente), round_number=round_number)
 
@@ -159,8 +160,9 @@ def partie():
 @app.route('/nouvelle_question', methods=['POST'])
 def nouvelle_question():
     global question_actuelle
-    question_actuelle = obtenir_question()  # Obtenir une nouvelle question de l'API
+    question_actuelle = obtenir_question()
     if question_actuelle:
+        socketio.emit('Nouvelle question')
         return redirect(url_for('partie'))
     else:
         # Gérer le cas où aucune question n'a pu être récupérée
@@ -173,7 +175,7 @@ def verifier_joueur(joueur):
         return jsonify({"redirect": url_for('resultat')}), 200
     if roles[joueur] == 'Tricheur':
         tricheur_revele = True
-        socketio.emit('Tricheur revélé', boadcast=True)
+        socketio.emit('Tricheur revélé')
         tricheur = joueur
         if round_number == 0:
             init_points()

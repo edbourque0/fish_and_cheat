@@ -4,9 +4,15 @@
 <script type="text/javascript">
     const socket = io.connect("http://192.168.2.39:2827");
     socket.on('Joueur en attente', function() {
-        window.location.href = '/salle_attente';
+        // Sélectionner le bouton par son ID et le retirer
+        var boutonNouvellePartie = document.getElementById("boutonNouvellePartie");
+        if (boutonNouvellePartie) {
+            boutonNouvellePartie.parentNode.removeChild(boutonNouvellePartie);
+        }
     });
 </script>
+
+
 <head>
     <meta charset="UTF-8">
     <title>Rejoindre la partie</title>
@@ -27,7 +33,10 @@
     {% endif %}
     <p></p>
     {% if nbattente == 0 %}
-    <form id='nouvelle_partie' action="{{ url_for('reset') }} " method="POST"><button class="reset" type="submit">Créer une nouvelle partie</button></form>
+    <form id='nouvelle_partie' action="{{ url_for('reset') }} " method="POST">
+        <button id="boutonNouvellePartie" class="reset" type="submit">Créer une nouvelle partie</button>
+    </form>
     {% endif %}
+    
 </body>
 </html>

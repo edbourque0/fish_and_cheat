@@ -6,6 +6,9 @@
     socket.on('Nouvelle round', function() {
         location.reload();
     });
+    socket.on('Nouvelle partie', function() {
+        window.location.href = '/';
+    });
 </script>
 <head>
     <meta charset="UTF-8">
