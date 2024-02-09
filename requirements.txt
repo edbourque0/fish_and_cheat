@@ -1,8 +1,6 @@
 # To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
 bidict==0.22.1
 blinker==1.7.0
-certifi @ file:///private/tmp/python-certifi-20231008-5865-ama8d2/certifi-2023.7.22
-cffi @ file:///private/tmp/cffi-20231015-5876-1oubxev/cffi-1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
 Flask==3.0.0
