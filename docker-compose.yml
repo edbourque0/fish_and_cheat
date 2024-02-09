@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   fishandcheat:
-    image: fishandcheat
+    image: edbourque0/fishandcheat:latest
     build:
       context: .
       dockerfile: ./Dockerfile
