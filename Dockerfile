@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-ENV FLASK_APP=app.py
+ENV FLASK_APP=__main__
 
 # Install pip requirements
 COPY requirements.txt .
