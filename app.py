@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 import requests
 import random
 import time
 
 
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = '872y3r872h3e872h367r24gr23ge'
 socketio = SocketIO(app, logger=True)
 
