@@ -3,13 +3,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="text/javascript">
     const socket = io.connect("https://game.ebourque.com");
-    socket.on('Joueur en attente', function() {
-        // Sélectionner le bouton par son ID et le retirer
-        var boutonNouvellePartie = document.getElementById("boutonNouvellePartie");
-        if (boutonNouvellePartie) {
-            boutonNouvellePartie.parentNode.removeChild(boutonNouvellePartie);
-        }
-    });
 </script>
 <head>
     <meta charset="UTF-8">
@@ -32,11 +25,9 @@
     <p></p>
     {% endif %}
     <p></p>
-    {% if nbattente == 0 %}
     <form id='nouvelle_partie' action="{{ url_for('reset') }} " method="POST">
         <button id="boutonNouvellePartie" class="reset" type="submit">Créer une nouvelle partie</button>
     </form>
-    {% endif %}
     
 </body>
 </html>

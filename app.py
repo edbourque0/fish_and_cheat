@@ -21,6 +21,7 @@ tricheur_revele = False #Variable pour savoir si le tricheur a été révélé
 tricheur = '' #Variable pour stocker le nom du tricheur temporairement
 round_number = 0 #Nombre de round jouées dans la partie
 joueurs_en_attente = []
+joueurs_connectes = 0
 
 
 def obtenir_question(max_retries=5):
@@ -61,6 +62,12 @@ def reset_param():
         tricheur = ''
         init_points()
         round_number = 0
+        print('Nouvelle partie crée')
+
+def check_if_connected():
+    #Regarde si tout les clients sont déconnectés et reset une partie
+    if joueurs_connectes == 0:
+        reset_param()
 
 def retourner(role_retourne, joueur_retourne):
     #Fonction pour retourner un joueur
@@ -191,7 +198,16 @@ def resultat():
 
 @socketio.on('connect')
 def handle_connect():
+    global joueurs_connectes
+    joueurs_connectes += 1
     print('Nouveau joueur connecté!')
+    
+@socketio.on('disconnect')
+def handle_connect():
+    global joueurs_connectes
+    joueurs_connectes -= 1
+    check_if_connected()
+    print('Joueur déconnecté')
 
 
 if __name__ == '__main__':
