@@ -18,18 +18,6 @@
             listeJoueurs.appendChild(li);
         });
     });
-    socket.on('Joueur déconnecté', function(joueurDéconnecté) {
-        const listeJoueurs = document.querySelector('ul');
-        const elementsJoueurs = listeJoueurs.getElementsByTagName('li');
-    
-        // Parcourir les éléments de la liste pour trouver le joueur déconnecté
-        for(let i = 0; i < elementsJoueurs.length; i++) {
-            if(elementsJoueurs[i].textContent === joueurDéconnecté) {
-                listeJoueurs.removeChild(elementsJoueurs[i]); // Enlever le joueur de la liste
-                break; // Sortir de la boucle une fois le joueur trouvé et enlevé
-            }
-        }
-    });
     socket.on('Partie commencée', function() {
         location.reload();
     });
