@@ -13,7 +13,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=0.7">
-    <title>Résultats de la Partie</title>
+    <title>Résultats de la partie</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -21,10 +21,11 @@
         <h1>Résultats de la partie</h1>
             <p class=text_centre>Le tricheur était : <span class='gros_role'>{{ tricheur }}</span></p>
             <p class=text_centre>Vous avez <span class='gros_role'>{{ points[session['nom']] }}</span> points</p>
-        <div></div>
         <form action="{{ url_for('salle_attente') }}" method="get">
             <button class='bouton_retourne' type="submit">Prochaine round</button>
         </form>
+        <p></p>
+        <p class=text_centre>{{ nom_gagnant }} gagne ({{ points_gagnant }} points)</p>
         <p></p>
         <p></p>
     </div>
