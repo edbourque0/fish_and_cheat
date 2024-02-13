@@ -10,14 +10,19 @@
     const socket = io.connect("http://192.168.2.39:2827");
     socket.on('Joueur en attente', function(joueurs) {
         const listeJoueurs = document.querySelector('ul');
-        listeJoueurs.innerHTML = ''; // Vide la liste actuelle
-
+    
+        // Vide la liste actuelle
+        while (listeJoueurs.firstChild) {
+            listeJoueurs.removeChild(listeJoueurs.firstChild);
+        }
+    
         joueurs.forEach(joueur => { // Ajoute chaque joueur mis à jour à la liste
             const li = document.createElement('li');
             li.textContent = joueur;
             listeJoueurs.appendChild(li);
         });
     });
+    
     socket.on('Partie commencée', function() {
         location.reload();
     });
