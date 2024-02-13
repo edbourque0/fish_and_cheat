@@ -61,7 +61,6 @@ def reset_param():
         tricheur = ''
         init_points()
         round_number = 0
-        print('Nouvelle partie crée')
 
 def check_if_connected():
     #Regarde si tout les clients sont déconnectés et reset une partie
@@ -120,6 +119,7 @@ def home():
 @app.route('/reset', methods=['POST'])
 def reset():
     reset_param()
+    socketio.emit('Nouvelle partie crée')
     return redirect(url_for('home'))
 
 @app.route('/salle_attente')

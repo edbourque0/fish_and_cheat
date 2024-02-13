@@ -21,6 +21,9 @@
     socket.on('Partie commencée', function() {
         location.reload();
     });
+    socket.on('Nouvelle partie crée', function() {
+        window.location.href = '/';
+    });
     document.onreadystatechange = function() {
         if (document.readyState !== "complete") {
             document.querySelector(
@@ -47,7 +50,7 @@
         {% if joueur_session == premier_joueur %}
         <div>
             <form action="{{ url_for('lancer_jeu') }}" method="post">
-                <button type="submit" class="start-game">Démarrer la partie</button><span class="loader" id=="loader"></span>
+                <button type="submit" class="start-game">Démarrer la partie</button>
             </form>
         </div>
         {% else %}
