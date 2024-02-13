@@ -53,11 +53,18 @@
             </ul>
         </section>
         {% if joueur_session == premier_joueur %}
-        <div>
-            <form action="{{ url_for('lancer_jeu') }}" method="post">
-                <button type="submit" class="start-game">Démarrer la partie</button>
-            </form>
-        </div>
+        <form action="{{ url_for('lancer_jeu') }}" method="post">
+            <div>
+                <p>Difficulté des questions :</p>
+                <input type="radio" name="difficulte_questions" id="facile" value="easy" checked/>
+                <label for="facile">Facile</label>
+                <input type="radio" name="difficulte_questions" id="moyen" value="medium"/>
+                <label for="moyen">Moyen</label>
+                <input type="radio" name="difficulte_questions" id="difficile" value="hard"/>
+                <label for="difficile">Difficile</label>
+            </div>
+            <button type="submit" class="start-game">Démarrer la partie</button>
+        </form>        
         {% else %}
         <p>En attente du début de la partie...</p>
         {% endif %}

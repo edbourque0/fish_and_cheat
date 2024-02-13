@@ -21,11 +21,12 @@ tricheur_revele = False #Variable pour savoir si le tricheur a été révélé
 tricheur = '' #Variable pour stocker le nom du tricheur temporairement
 round_number = 0 #Nombre de round jouées dans la partie
 joueurs_en_attente = []
+difficulte = ''
 
 
 def obtenir_question(max_retries=5):
     #Va chercher la question sur l'API de opentdb
-    url = "https://opentdb.com/api.php?amount=1&type=multiple"
+    url = f"https://opentdb.com/api.php?amount=1&difficulty={difficulte}&type=multiple"
     for attempt in range(max_retries):
         response = requests.get(url)
         if response.status_code == 200:
@@ -98,6 +99,7 @@ def attendre(nom):
     if nom not in joueurs_en_attente:
         joueurs_en_attente.append(nom)
 
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -117,9 +119,9 @@ def reset():
     socketio.emit('Nouvelle partie crée')
     return redirect(url_for('home'))
 
-@app.route('/salle_attente')
+@app.route('/salle_attente', methods=['GET'])
 def salle_attente():
-    global tricheur_revele
+    global tricheur_revele, difficulte
     tricheur_revele = False
     socketio.emit('Joueur en attente', joueurs)
     attendre(session['nom'])
@@ -130,8 +132,9 @@ def salle_attente():
 
 @app.route('/lancer_jeu', methods=['POST'])
 def lancer_jeu():
-    global partie_demarree, question_actuelle
+    global partie_demarree, question_actuelle, difficulte
     if 'nom' in session and joueurs and session['nom'] == joueurs[0]:
+        difficulte = request.form['difficulte_questions']
         question_actuelle = obtenir_question()
         if len(joueurs_en_attente) == len(joueurs):
             if question_actuelle:
@@ -188,7 +191,10 @@ def verifier_joueur(joueur):
 def resultat():
     global points, tricheur, partie_demarree
     partie_demarree = False
-    return render_template('resultat.html', tricheur=tricheur, points=points)
+    nom_gagnant = [k for k, v in points.items() if v == max(points.values())][0]
+    points_gagnant = points[nom_gagnant]
+    print(points)
+    return render_template('resultat.html', tricheur=tricheur, points=points, nom_gagnant=nom_gagnant, points_gagnant=points_gagnant)
 
 @socketio.on('connect')
 def handle_connect():
@@ -197,4 +203,4 @@ def handle_connect():
     
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=2827, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=2827, debug=True)
