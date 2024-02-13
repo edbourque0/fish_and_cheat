@@ -51,21 +51,16 @@ def assigner_roles():
 
 def reset_param():
     #Fonction pour reseter les paramêtres pour pouvoir jouer une nouvelle partie
-    if len(joueurs_en_attente) == 0:
-        global joueurs, roles, partie_demarree, question_actuelle, tricheur, tricheur_revele, round_number
-        joueurs = []
-        roles = {}
-        partie_demarree = False
-        question_actuelle = None
-        tricheur_revele = False
-        tricheur = ''
-        init_points()
-        round_number = 0
-
-def check_if_connected():
-    #Regarde si tout les clients sont déconnectés et reset une partie
-    if joueurs_connectes == 0:
-        reset_param()
+    global joueurs, roles, partie_demarree, question_actuelle, tricheur, tricheur_revele, round_number
+    joueurs = []
+    roles = {}
+    partie_demarree = False
+    question_actuelle = None
+    tricheur_revele = False
+    tricheur = ''
+    init_points()
+    round_number = 0
+    joueurs_en_attente.clear()
 
 def retourner(role_retourne, joueur_retourne):
     #Fonction pour retourner un joueur
